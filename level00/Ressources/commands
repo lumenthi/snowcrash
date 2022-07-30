@@ -1,0 +1,22 @@
+# Find files owned by flag00 so maybe we can find a flag file or smthg useful
+find / -user flag00 2>/dev/null
+[...]
+/usr/sbin/john
+/rofs/usr/sbin/john
+=======================================
+# What kind of files are those
+level00@SnowCrash:~$ file /usr/sbin/john
+/usr/sbin/john: ASCII text
+=======================================
+# Put this string in dcode.fr so maybe we can identify an encryption
+level00@SnowCrash:~$ cat /usr/sbin/john
+cdiiddwpgswtgt
+=======================================
+# We can see that this is a ROT encryption (caesar is basically a rot encryption)
+nottoohardhere
+=======================================
+level00@SnowCrash:~$ su flag00
+Password: nottoohardhere
+Don't forget to launch getflag !
+flag00@SnowCrash:~$ getflag
+Check flag.Here is your token : x24ti5gi3x0ol2eh4esiuxias
