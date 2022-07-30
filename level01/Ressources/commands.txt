@@ -1,0 +1,34 @@
+# I used to run cat /etc/passwd when trying to solve level00
+
+level01@SnowCrash:~$ cat /etc/passwd
+[...]
+flag01:42hDRfypTqqnw:3001:3001::/home/flag/flag01:/bin/bash
+[..]
+============================================================
+# The /etc/passwd file stores essential information required
+	during login. In other words, it stores user account information.
+	username:passwd:UID:GID
+# Here, for user flag01 we have a clear password, let's try that
+level01@SnowCrash:~$ su flag01
+Password: 42hDRfypTqqnw
+su: Authentication failure
+# NOP :(
+============================================================
+# When reading doc about /etc/passwd, its appears that old
+	linux used to store encrypted passwords in /etc/passwd
+	with DES encryption, DES encryption is weak and the
+	password is short, lets try to bruteforce it
+	with john
+
+# I downloaded a VM with kali so it comes with all the tools
+	we need
+$ john passwd
+[..]
+abcdefg
+[..]
+============================================================
+level01@SnowCrash:~$ su flag01
+Password: abdefg
+Don't forget to launch getflag !
+flag01@SnowCrash:~$ getflag
+Check flag.Here is your token : f2av5il02puano7naaf6adaaf
