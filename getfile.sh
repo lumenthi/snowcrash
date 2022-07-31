@@ -1,1 +1,4 @@
-scp -P 4242 level00@192.168.56.101:/bin/getflag ./
+# sh getfile.sh level00 /bin/getflag
+####################################
+
+scp -P 4242 $1@192.168.56.101:$2 ./

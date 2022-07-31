@@ -1,0 +1,36 @@
+# First reflex is to check files in home repo
+level02@SnowCrash:~$ ls -a
+.  ..  .bash_logout  .bashrc  level02.pcap  .profile
+==========================================================
+# Here we have a file "level02.pcap" let's check its type
+level02@SnowCrash:~$ file level02.pcap
+level02.pcap: tcpdump capture file (little-endian)
+==========================================================
+# Interesting, a capture of a TCP communication...
+	let's run strings to check if we can extract
+	a password
+==========================================================
+# At first, i see a string Password, might be a good idea
+	to check if this is a valid password for our user
+	flag 02... Spoiler: NOP
+strings level02.pcap
+[...]
+Password: Nf&Nat
+[...]
+==========================================================
+# Well, we need a deeper analysis of this communication,
+	i will analyse this file with wireshark in my VM.
+	For a better understanding of packets, i use the
+	"follow tcp stream" function (follow.png).
+	We can see that there is a field
+	"Password: ft_wandr...NDRe1.L0L".
+level02@SnowCrash:~$ su flag02
+Password: ft_wandr...NDRe1.L0L
+su: Authentication failure
+==========================================================
+# https://mike-boya.github.io/post/exploit-exercises-nebula-level08/
+# Ok, it does not work... Let's consider
+	that '.' are deletions:
+level02@SnowCrash:~$ su flag02
+Password: ft_waNDReL0L
+Don't forget to launch getflag !

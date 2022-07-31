@@ -1,0 +1,32 @@
+# First i get informations about the file in our home
+level03@SnowCrash:~$ ls
+level03
+level03@SnowCrash:~$ file level03
+level03: setuid setgid ELF 32-bit LSB executable
+level03@SnowCrash:~$ ./level03
+Exploit me
+=============================================================
+# Let's try to reverse the binary, i get it from the VM
+	with my getfile script getfile.sh level03 /home/user/level03/level03
+	Once downloaded, i open the file in Ghidra (in my VM) (ghidra.png).
+[...]
+system("/usr/bin/env echo Exploit me");
+[..]
+=============================================================
+# When seeing this, the first idea that comes in my mind is
+	to exploit the env variables
+# At first, i tried to exploit the BASH_FUNC functionality
+$ echo() { ls; }
+$ export -f echo
+$ env
+[...]
+BASH_FUNC_echo%%=() {  ls  }
+[...]
+$ echo
+level03
+# But it does not work, the env command make those variables useless
+$ env echo salut
+salut
+=============================================================
+# This being useless, i'll try to work around the PATH variable
+
