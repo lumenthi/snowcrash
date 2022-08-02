@@ -2,11 +2,6 @@
 #include <unistd.h>
 #include <string.h>
 
-/*
- * HOW I BYPASSED ALL THE DIFFICULTY OF THE PROJET BY REVERSING
- * THE GEFLAG BINARY
- */
-
 char * ft_des(char *param_1)
 {
 	char cVar1;
