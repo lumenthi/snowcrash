@@ -1,0 +1,34 @@
+level09@SnowCrash:~$ ls -l
+total 12
+-rwsr-sr-x 1 flag09 level09 7640 Mar  5  2016 level09
+----r--r-- 1 flag09 level09   26 Mar  5  2016 token
+
+level09@SnowCrash:~$ xxd token
+0000000: 6634 6b6d 6d36 707c 3d82 7f70 826e 8382  f4kmm6p|=..p.n..
+0000010: 4442 8344 757b 7f8c 890a                 DB.Du{....
+
+level09@SnowCrash:~$ strings level09
+[...]
+You should not reverse this
+LD_PRELOAD
+Injection Linked lib detected exit..
+[...]
+
+# Well, no reverse for this one >:( ... Should i ?
+==================================================================
+
+# For me, the value in token was the value converted with ./level09
+	so the goal to achieve is ./token [flag]
+
+# After a little of research i saw the correlation between the input arg
+	and the output so i made a script that convert output>input
+	(check script.py)
+
+➜  Snowcrash git:(master) ✗ python3 level09/Ressources/script.py
+f3iji1ju5yuevaus41q1afiuq
+
+level09@SnowCrash:~$ su flag09
+Password: f3iji1ju5yuevaus41q1afiuq
+Don't forget to launch getflag !
+flag09@SnowCrash:~$ getflag
+Check flag.Here is your token : s5cAJpM8ev6XHw998pRWG728z
