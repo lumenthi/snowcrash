@@ -19,3 +19,19 @@ level08@SnowCrash:~$ cat /tmp/zob
 cat: /tmp/zob: Permission denied
 level08@SnowCrash:~$ ./level08 /tmp/zob
 quif5eloekouj29ke0vouxean
+
+======================================================================
+
+# Looks like this isn't our flag, well maybe i missed a part with
+	getflag :^)
+
+level08@SnowCrash:~$ su level09
+Password: quif5eloekouj29ke0vouxean
+su: Authentication failure
+
+# Let's try to su to flag08 instead
+level08@SnowCrash:~$ su flag08
+Password: quif5eloekouj29ke0vouxean
+Don't forget to launch getflag !
+flag08@SnowCrash:~$ getflag
+Check flag.Here is your token : 25749xKZ8L7DkSCwJkT9dyv6f
