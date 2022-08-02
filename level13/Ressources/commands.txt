@@ -1,0 +1,41 @@
+level13@SnowCrash:~$ ls -l
+total 8
+-rwsr-sr-x 1 flag13 level13 7303 Aug 30  2015 level13
+
+level13@SnowCrash:~$ file level13
+level13: setuid setgid ELF 32-bit LSB executable
+
+level13@SnowCrash:~$ ./level13
+UID 2013 started us but we we expect 4242
+
+# Nice this looks like pure reversing :) :) :)
+
+(gdb) disas main
+Dump of assembler code for function main:
+  [...]
+   0x0804859a <+14>:	cmp    $0x1092,%eax
+   0x0804859f <+19>:	je     0x80485cb <main+63> # Suspicious jump, leads to exit, i must not take it
+  [...]
+   0x080485c6 <+58>:	call   0x80483a0 <exit@plt>
+  [...]
+   0x080485cb <+63>:	movl   $0x80486ef,(%esp) # Why wasting time filling the right value in the stack ?
+													# Let's just jump here
+   0x080485d2 <+70>:	call   0x8048474 <ft_des>
+   0x080485d7 <+75>:	mov    $0x8048709,%edx
+   0x080485dc <+80>:	mov    %eax,0x4(%esp)
+   0x080485e0 <+84>:	mov    %edx,(%esp)
+   0x080485e3 <+87>:	call   0x8048360 <printf@plt>
+   0x080485e8 <+92>:	leave  
+   0x080485e9 <+93>:	ret    
+End of assembler dump.
+(gdb) b *0x0804859a
+Breakpoint 1 at 0x804859a
+
+(gdb) run
+Starting program: /home/user/level13/level13 
+Breakpoint 1, 0x0804859a in main ()
+
+(gdb) jump *0x080485cb
+Continuing at 0x80485cb.
+your token is 2A31L79asukciNyi8uppkEuSx
+[Inferior 1 (process 2175) exited with code 050]
